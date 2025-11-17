@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Calculator</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #0d0d0d, #262626);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    .calculator {
+      width: 350px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 25px;
+      border-radius: 25px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0px 0px 20px rgba(0, 255, 170, 0.3);
+    }
+
+    /* Display is now part of calculator field */
+    .display-wrapper {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: inset 0px 0px 15px rgba(0,0,0,0.5);
+    }
+
+    .display {
+      width: 100%;
+      text-align: right;
+      font-size: 40px;
+      color: #aef4e4;
+      min-height: 60px;
+      overflow-x: auto;
+      padding-right: 5px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    button {
+      padding: 20px;
+      font-size: 20px;
+      border: none;
+      border-radius: 50px;
+      background: #1e1e1e;
+      color: #d9f8ff;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0px 0px 8px rgba(0, 255, 200, 0.3);
+    }
+
+    button:hover {
+      transform: scale(1.08);
+      background: #2d2d2d;
+    }
+
+    .op {
+      background: #ff4d6d;
+    }
+
+    .op:hover {
+      background: #ff6a88;
+    }
+
+    .equals {
+      grid-column: span 2;
+      background: #2ec4b6;
+      color: #003049;
+      font-weight: bold;
+    }
+
+    .equals:hover {
+      background: #48e6d6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator">
+
+    <div class="display-wrapper">
+      <div id="display" class="display">0</div>
+    </div>
+
+    <div class="buttons">
+      <button onclick="clearDisplay()">C</button>
+      <button onclick="backspace()">⌫</button>
+      <button onclick="percent()">%</button>
+      <button class="op" onclick="operator('/')">÷</button>
+
+      <button onclick="digit('7')">7</button>
+      <button onclick="digit('8')">8</button>
+      <button onclick="digit('9')">9</button>
+      <button class="op" onclick="operator('*')">×</button>
+
+      <button onclick="digit('4')">4</button>
+      <button onclick="digit('5')">5</button>
+      <button onclick="digit('6')">6</button>
+      <button class="op" onclick="operator('-')">−</button>
+
+      <button onclick="digit('1')">1</button>
+      <button onclick="digit('2')">2</button>
+      <button onclick="digit('3')">3</button>
+      <button class="op" onclick="operator('+')">+</button>
+
+      <button onclick="digit('0')" style="grid-column: span 2;">0</button>
+      <button onclick="decimal()">.</button>
+      <button class="equals" onclick="calculate()">=</button>
+    </div>
+
+  </div>
+
+  <script>
+    let display = document.getElementById("display");
+    let current = "0";
+    let expression = "";
+    let lastWasEqual = false;
+
+    function updateDisplay() {
+      display.innerText = current;
+    }
+
+    function digit(n) {
+      if (lastWasEqual) {
+        current = n;
+        expression = "";
+        lastWasEqual = false;
+        updateDisplay();
+        return;
+      }
+      if (current === "0") current = n;
+      else current += n;
+      updateDisplay();
+    }
+
+    function decimal() {
+      if (lastWasEqual) {
+        current = "0.";
+        expression = "";
+        lastWasEqual = false;
+        updateDisplay();
+        return;
+      }
+      if (!current.includes(".")) {
+        current += ".";
+        updateDisplay();
+      }
+    }
+
+    function operator(op) {
+      if (lastWasEqual) {
+        expression = current;
+        lastWasEqual = false;
+      }
+
+      if (expression !== "" && isLastCharOperator(expression)) {
+        expression = expression.slice(0, -1) + op;
+      } else {
+        expression += current + op;
+      }
+      current = "0";
+      updateDisplay();
+    }
+
+    function isLastCharOperator(str) {
+      const last = str[str.length - 1];
+      return ["+", "-", "*", "/"].includes(last);
+    }
+
+    function clearDisplay() {
+      current = "0";
+      expression = "";
+      lastWasEqual = false;
+      updateDisplay();
+    }
+
+    function backspace() {
+      if (current.length <= 1) current = "0";
+      else current = current.slice(0, -1);
+      updateDisplay();
+    }
+
+    function percent() {
+      current = String(Number(current) / 100);
+      updateDisplay();
+    }
+
+    function calculate() {
+      let full = expression + current;
+
+      for (let c of full) {
+        if (!"0123456789+-*/.".includes(c)) {
+          current = "Error";
+          updateDisplay();
+          return;
+        }
+      }
+
+      try {
+        current = String(eval(full));
+        expression = "";
+        lastWasEqual = true;
+        updateDisplay();
+      } catch {
+        current = "Error";
+        updateDisplay();
+      }
+    }
+  </script>
+
+</body>
+</html>

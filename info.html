@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Beginner Form</title>
+</head>
+<body>
+
+<input type="text" id="inputBox" placeholder="Enter data">
+<br>
+<p id="errorMsg" style="color:red;"></p>
+
+<select id="typeSelect">
+    <option value="">Select Type</option>
+    <option value="Name">Name</option>
+    <option value="Number">Number</option>
+    <option value="Email">Email</option>
+    <option value="Address">Address</option>
+    <option value="ID">ID</option>
+</select>
+
+<button id="addBtn">Add</button>
+
+<label id="typeLabel"></label>
+
+<br><br>
+
+<input type="text" id="showBox" readonly>
+
+<br><br>
+
+<button id="saveBtn">Save</button>
+
+<div id="savedInfo"></div>
+
+<script>
+    const box = document.getElementById("inputBox");
+    const selector = document.getElementById("typeSelect");
+    const addButton = document.getElementById("addBtn");
+    const labelShow = document.getElementById("typeLabel");
+    const outputBox = document.getElementById("showBox");
+    const saveButton = document.getElementById("saveBtn");
+    const showSaved = document.getElementById("savedInfo");
+    const msg = document.getElementById("errorMsg");
+
+    addButton.onclick = function () {
+        msg.textContent = "";
+
+        const value = box.value;
+        const type = selector.value;
+
+        if (value === "") {
+            msg.textContent = "Please enter some data!";
+            return;
+        }
+
+        if (type === "") {
+            msg.textContent = "Please select a type!";
+            return;
+        }
+
+        if (type === "Number") {
+            if (isNaN(value)) {
+                msg.textContent = "Please enter a valid Number!";
+                return;
+            }
+        }
+
+        if (type === "Name") {
+            let ok = true;
+            for (let i = 0; i < value.length; i++) {
+                const c = value[i];
+                if (!((c >= "A" && c <= "Z") || (c >= "a" && c <= "z") || c === " ")) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (!ok) {
+                msg.textContent = "Please enter a valid Name!";
+                return;
+            }
+        }
+
+        if (type === "Email") {
+            if (value.indexOf("@") === -1 || value.indexOf(".") === -1) {
+                msg.textContent = "Please enter a valid Email!";
+                return;
+            }
+        }
+
+        if (type === "ID") {
+            const parts = value.split("-");
+            if (parts.length !== 3) {
+                msg.textContent = "ID must follow this format: 22-22483-3";
+                return;
+            }
+
+            const first = parts[0];
+            const second = parts[1];
+            const third = parts[2];
+
+            if (
+                first.length !== 2 ||
+                second.length !== 5 ||
+                third.length !== 1 ||
+                isNaN(first) ||
+                isNaN(second) ||
+                isNaN(third)
+            ) {
+                msg.textContent = "Please enter a valid ID (e.g., 22-22483-3)";
+                return;
+            }
+        }
+
+        labelShow.textContent = type;
+        outputBox.value = value;
+    };
+
+    saveButton.onclick = function () {
+        msg.textContent = "";
+
+        if (labelShow.textContent === "" || outputBox.value === "") {
+            msg.textContent = "Please add the data first!";
+            return;
+        }
+
+        const line = document.createElement("p");
+        line.textContent = labelShow.textContent + ": " + outputBox.value;
+        showSaved.appendChild(line);
+    };
+</script>
+
+
+</body>
+</html>
